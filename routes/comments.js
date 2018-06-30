@@ -1,3 +1,4 @@
+/* jshint esversion: 6*/
 var Campground = require("../models/campgrounds");
 var Comment = require("../models/comment");
 var express = require("express");
@@ -20,7 +21,7 @@ function isLoggedIn(req, res, next){
 router.get("/new",isLoggedIn, function(req, res){
   Campground.findById(req.params.id, function(err, campground){
     if(err)
-      console.log(err)
+      console.log(err);
     else{
       res.render("comments/new",{campground: campground});
     }
@@ -30,11 +31,14 @@ router.get("/new",isLoggedIn, function(req, res){
 router.post("/",isLoggedIn, function(req, res){
   Campground.findById(req.params.id, function(err, campground){
     if(err){
-      console.log(err)
+      console.log(err);
       res.redirect("/campgrounds/"+req.params.id);
     }
     else{
       Comment.create(req.body.comment, function(err, comment){
+        comment.author.is = req.user._id;
+        comment.author.username=req.user.username();
+        comment.save();
         campground.comments.push(comment);
         campground.save();
 
